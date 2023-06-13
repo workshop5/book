@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include<sys/types.h>
+#include <unistd.h>
+// #include<stdlib.h>
+// #include<sys/wait.h>
+int main()
+{
+    int pid;
+    pid = fork();
+    if(pid<0)
+    {
+        printf("Creating Child process Unsuccessful");
+    }
+    else if(pid == 0)
+    {
+        printf("Child process is created successfully\n");
+        execl("/bin/ls","/bin/ls",NULL);//When execl() is called, it loads and executes the new program, replacing the current process. 
+    }
+    else
+    {
+        printf("Parent process id = %d",pid);
+        wait();
+    }
+    system("ps");// The system("ps") function call is used to execute the "ps" command in a C or C++ program.
+    system("join t1.txt t2.txt > t3.txt");//The join command reads the contents of t1.txt and t2.txt, performs the join operation, and the resulting output is redirected to t3.txt.
+    return 0;
+}

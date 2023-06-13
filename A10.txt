@@ -1,0 +1,113 @@
+def fifo_page_replacement(pages, num_frames):
+    frame_set = set()
+    frame_queue = []
+    page_faults = 0
+    page_hits = 0
+
+    for page in pages:
+        if page in frame_set:
+            page_hits += 1
+        else:
+            if len(frame_queue) == num_frames:
+                removed_page = frame_queue.pop(0)
+                frame_set.remove(removed_page)
+            frame_queue.append(page)
+            frame_set.add(page)
+            page_faults += 1
+
+        print(f"Page {page} loaded into memory. Frame queue: {frame_queue}")
+
+    return page_faults, page_hits
+
+
+def lru_page_replacement(pages, num_frames):
+    frame_dict = {}
+    page_faults = 0
+    page_hits = 0
+    timestamp = 0
+
+    for page in pages:
+        timestamp += 1
+
+        if page in frame_dict:
+            frame_dict[page] = timestamp
+            page_hits += 1
+        else:
+            if len(frame_dict) == num_frames:
+                min_timestamp_page = min(frame_dict, key=frame_dict.get)
+                del frame_dict[min_timestamp_page]
+            frame_dict[page] = timestamp
+            page_faults += 1
+
+        print(f"Page {page} loaded into memory. Frame dictionary: {frame_dict}")
+
+    return page_faults, page_hits
+
+
+def optimal_page_replacement(pages, num_frames):
+    frame_set = set()
+    page_faults = 0
+    page_hits = 0
+
+    for i in range(len(pages)):
+        if pages[i] in frame_set:
+            page_hits += 1
+        else:
+            if len(frame_set) == num_frames:
+                index = i + 1
+                future_pages = pages[index:]
+                frame_index = -1
+                for frame in frame_set:
+                    if frame not in future_pages:
+                        frame_index = frame
+                        break
+                if frame_index == -1:
+                    frame_index = future_pages[0]
+                frame_set.remove(frame_index)
+            frame_set.add(pages[i])
+            page_faults += 1
+
+        print(f"Page {pages[i]} loaded into memory. Frame set: {frame_set}")
+
+    return page_faults, page_hits
+
+
+# Main program
+while True:
+    num_pages = int(input("Enter the number of pages: "))
+    page_string = input("Enter the page reference string (space-separated): ")
+    pages = list(map(int, page_string.split()))
+    num_frames = int(input("Enter the number of frames: "))
+
+    print("Choose a page replacement algorithm:")
+    print("1. FIFO")
+    print("2. LRU")
+    print("3. Optimal")
+    print("4. Exit")
+    choice = int(input("Enter your choice: "))
+
+    if choice == 1:
+        faults, hits = fifo_page_replacement(pages, num_frames)
+    elif choice == 2:
+        faults, hits = lru_page_replacement(pages, num_frames)
+    elif choice == 3:
+        faults, hits = optimal_page_replacement(pages, num_frames)
+    elif choice == 4:
+        print("Exiting...")
+        break
+    else:
+        print("Invalid choice. Please try again.")
+        continue
+
+    hit_ratio = hits / num_pages
+    fault_ratio = faults / num_pages
+
+    print("Number of page faults:", faults)
+    print("Number of page hits:", hits)
+    print("Hit Ratio:", hit_ratio)
+    print("Page Fault ratio or Miss Ratio:", fault_ratio)
+
+    continue_choice = input("Do you want to continue? (yes/no): ")
+    if continue_choice.lower() != "yes":
+        print("Exiting...")
+        break
